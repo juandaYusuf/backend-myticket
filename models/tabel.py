@@ -51,5 +51,13 @@ pembelian = Table(
     Column('tanggal', DateTime),
 )
 
+saldo_user = Table(
+    'saldo_user',
+    metaData,
+    Column('id', Integer, primary_key=True),
+    Column('user_id', Integer, ForeignKey("users.id"), nullable=False),
+    Column('saldo', Integer)
+)
+
 
 metaData.create_all(engine)
