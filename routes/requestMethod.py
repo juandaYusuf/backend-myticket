@@ -2,9 +2,9 @@
 from fastapi import APIRouter, UploadFile, File
 import secrets
 from PIL import Image
-from models.tabel import users, artikels, tiket, pembelian, saldo_user
+from models.tabel import users, artikels, tiket, pembelian, saldo_user, topup_user
 from config.db import conn
-from schema.schemas import User, LoginData, CheckCurrentPWD, UpdatePWD, ProfilePicture, BannerPicture, Artikel, UpdateThumbnailArtikel, postArtikel, tiketOrder, beliTiket
+from schema.schemas import User, LoginData, CheckCurrentPWD, UpdatePWD, ProfilePicture, BannerPicture, Artikel, UpdateThumbnailArtikel, postArtikel, tiketOrder, beliTiket, answerChecker
 
 
 router = APIRouter()
@@ -48,12 +48,9 @@ async def profileimage(image: UploadFile =File(...)):
 
 @router.post('/login/')
 async def login(data: LoginData):
-    response = conn.execute(users.select().where(
-        users.c.email == data.email, users.c.password == data.password 
-    ))
+    response = conn.execute(users.select().where(users.c.email == data.email, users.c.password == data.password ))
     if (response):
         return response.first()
-
 
 @router.post('/register/')
 async def register(user: User):
@@ -161,12 +158,24 @@ async def tiketSaya(userID: int):
 async def chekUserSaldo(userID: int):
     return conn.execute(saldo_user.select().where(saldo_user.c.user_id == userID)).first()
 
-@router.post('/topup/')
+@router.post('/topup/{userID}/{nominalSaldo}')
 async def  topup( userID: int, nominalSaldo: int):
     checkAvailabilityUser = conn.execute(saldo_user.select().where(saldo_user.c.user_id == userID)).fetchall()
     if not checkAvailabilityUser :
         conn.execute(saldo_user.insert().values(user_id = userID, saldo = nominalSaldo))
-        return conn.execute(saldo_user.select().where(saldo_user.c.user_id == userID)).fetchall()
     else:
         conn.execute(saldo_user.update().values(user_id = userID, saldo = nominalSaldo).where(saldo_user.c.user_id == userID))
-        return conn.execute(saldo_user.select().where(saldo_user.c.user_id == userID)).fetchall()
+    return conn.execute(saldo_user.select().where(saldo_user.c.user_id == userID)).fetchall()
+
+# Topup dengan soal pertanyaan
+@router.get('/questions-for-topup/')
+async def questionsForTopUp():
+    return conn.execute(topup_user.select()).fetchall()
+
+@router.post('/questions-for-topup/answer-checker')
+async def checkAnswer(data: answerChecker):
+    response = conn.execute(topup_user.select().where(topup_user.c.soal == data.soal, topup_user.c.correct_answer == data.correct_answer)).first()
+    if not response :
+        return "incorrect"
+    else:
+        return "correct"

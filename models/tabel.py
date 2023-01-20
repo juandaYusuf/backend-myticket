@@ -59,5 +59,12 @@ saldo_user = Table(
     Column('saldo', Integer)
 )
 
+topup_user = Table(
+    'topup_user',
+    metaData,
+    Column('id', Integer, primary_key=True),
+    Column('soal', String(500)),
+    Column('correct_answer', String(500)),
+)
 
 metaData.create_all(engine)

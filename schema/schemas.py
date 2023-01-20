@@ -52,3 +52,7 @@ class beliTiket(BaseModel):
     user_id: int
     tiket_id: int
     tanggal: str
+
+class answerChecker(BaseModel):
+    soal: str
+    correct_answer: str
