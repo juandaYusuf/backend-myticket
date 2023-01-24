@@ -1,19 +1,25 @@
 # Before runing backend app you should install bellow using pip
-* `pip install uvicorn`\
-* `pip install fastapi`\
-* `pip install pymysql`\
-* `pip install pillow`\
-* `pip install sqlalchemy`\
+* `pip install uvicorn`
+* `pip install fastapi`
+* `pip install pymysql`
+* `pip install pillow`
+* `pip install sqlalchemy`
 * `pip install python-multipart`
 
-# uvicorn -> https://www.uvicorn.org/
+# uvicorn 
+-> https://www.uvicorn.org/
 
-# fastapi -> https://fastapi.tiangolo.com/
+# fastapi 
+-> https://fastapi.tiangolo.com/
 
-# pymysql -> https://pymysql.readthedocs.io/en/latest/
+# pymysql 
+-> https://pymysql.readthedocs.io/en/latest/
 
-# pillow -> https://pillow.readthedocs.io/en/stable/
+# pillow 
+-> https://pillow.readthedocs.io/en/stable/
 
-# sqlalchemy -> https://www.sqlalchemy.org/
+# sqlalchemy 
+-> https://www.sqlalchemy.org/
 
-# python-multipart -> https://pypi.org/project/python-multipart/
+# python-multipart 
+-> https://pypi.org/project/python-multipart/
