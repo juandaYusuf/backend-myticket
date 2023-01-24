@@ -7,25 +7,22 @@
 * `pip install python-multipart`
 
 # Running the project
-> `python3 -m uvicorn index:MyApp --reload` or
-> `python -m uvicorn index:MyApp --reload`
-# use venv
-> `uvicorn index:MyApp`
+`python3 -m uvicorn index:MyApp --reload` or `uvicorn index:MyApp` if you use venv
 
 # uvicorn 
-> https://www.uvicorn.org/
+https://www.uvicorn.org/
 
 # fastapi 
-> https://fastapi.tiangolo.com/
+https://fastapi.tiangolo.com/
 
 # pymysql 
-> https://pymysql.readthedocs.io/en/latest/
+https://pymysql.readthedocs.io/en/latest/
 
 # pillow 
-> https://pillow.readthedocs.io/en/stable/
+https://pillow.readthedocs.io/en/stable/
 
 # sqlalchemy 
-> https://www.sqlalchemy.org/
+https://www.sqlalchemy.org/
 
 # python-multipart 
-> https://pypi.org/project/python-multipart/
+https://pypi.org/project/python-multipart/
