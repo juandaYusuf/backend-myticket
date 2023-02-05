@@ -2,9 +2,9 @@
 from fastapi import APIRouter, UploadFile, File
 import secrets
 from PIL import Image
-from models.tabel import users, artikels, tiket, pembelian, saldo_user, topup_user
+from models.tabel import users, artikels, tiket, pembelian, saldo_user, topup_user, like_artikels, comment_artikels
 from config.db import conn
-from schema.schemas import User, LoginData, CheckCurrentPWD, UpdatePWD, ProfilePicture, BannerPicture, Artikel, UpdateThumbnailArtikel, postArtikel, tiketOrder, beliTiket, answerChecker
+from schema.schemas import User, LoginData, CheckCurrentPWD, UpdatePWD, ProfilePicture, BannerPicture, Artikel, UpdateThumbnailArtikel, postArtikel, tiketOrder, beliTiket, answerChecker, sendComment, editComment
 
 
 router = APIRouter()
@@ -100,6 +100,11 @@ async def deleteUserData(id: int):
 async def fetchAllArtikel():
     return conn.execute(artikels.select()).fetchall()
 
+@router.get('/artikel-comment/{id}')
+async def fetchAllArtikel(id : int):
+    return conn.execute(artikels.select().where(artikels.c.id == id)).first()
+
+
 @router.get('/artikel_of_user/{idOfUser}')
 async def artikelOfUser(idOfUser: int):
     return conn.execute(artikels.select().where(artikels.c.user_id == idOfUser)).fetchall()
@@ -179,3 +184,66 @@ async def checkAnswer(data: answerChecker):
         return "incorrect"
     else:
         return "correct"
+
+# !Like artikel (sukai artikel)
+@router.get('/total-like-artikel/{artikelID}')
+async def totalLikesArtikel(artikelID: int):
+    response = conn.execute(like_artikels.select().where(like_artikels.c.artikel_id == artikelID, like_artikels.c.deskripsi == "like")).fetchall()
+    return len(response)
+
+@router.get('/show-artikel-like/{userID}/{artikelID}')
+async def showLikerOfArtikels(userID: int, artikelID: int):
+    response = conn.execute(like_artikels.select().where(like_artikels.c.user_id == userID, like_artikels.c.artikel_id == artikelID)).first()
+    if not response :
+        return 'this user likes it yet'
+    else :
+        return response 
+
+@router.post('/like-artikel/{userID}/{artikelID}/')
+async def usersLikeArticles(userID: int, artikelID: int):
+    response = conn.execute(like_artikels.select().where(like_artikels.c.user_id == userID, like_artikels.c.artikel_id == artikelID)).first()
+    if response :
+        if response.deskripsi == 'like' :
+            conn.execute(like_artikels.update().values( deskripsi = "unlike").where(like_artikels.c.artikel_id == artikelID, like_artikels.c.user_id == userID))
+        elif response.deskripsi == 'unlike' :
+            conn.execute(like_artikels.update().values( deskripsi = "like").where(like_artikels.c.artikel_id == artikelID, like_artikels.c.user_id == userID))
+    else :
+        conn.execute(like_artikels.insert().values( user_id = userID, artikel_id = artikelID, deskripsi = "like"))
+    return conn.execute(like_artikels.select().where(like_artikels.c.user_id == userID, like_artikels.c.artikel_id == artikelID)).first()
+
+# !Komentar Artikel
+@router.get('/total-comment-artikel/{artikelID}')
+async def totalCommentArtikel(artikelID: int):
+    response = conn.execute(comment_artikels.select().where(comment_artikels.c.artikels_id == artikelID)).fetchall()
+    return len(response)
+
+@router.get('/show-artikel-comment/{userID}/{artikelID}')
+async def showLikerOfArtikels(userID: int, artikelID: int):
+    response = conn.execute(comment_artikels.select().where(comment_artikels.c.user_id == userID, comment_artikels.c.artikels_id == artikelID)).first()
+    if not response :
+        return 'this user comment it yet'
+    else :
+        return response 
+
+@router.get('/comment-public/{artikelID}') #Menampilkan seluruh komentar per-artikel
+async def showAllCommentOfArtikel(artikelID: int):
+    return conn.execute(comment_artikels.select().where(comment_artikels.c.artikels_id == artikelID)).fetchall()
+
+@router.post('/send-comment-public/')
+async def sendComment(commentData : sendComment):
+    conn.execute(comment_artikels.insert().values(user_id = commentData.user_id, artikels_id = commentData.artikels_id, content = commentData.content ))
+    return conn.execute(comment_artikels.select().where(comment_artikels.c.artikels_id == commentData.artikels_id)).fetchall()
+
+@router.put('/edit-comment-public/')
+async def editComment(commentData : editComment):
+    conn.execute(comment_artikels.update().values(content = commentData.content ).where(comment_artikels.c.id == commentData.id, comment_artikels.c.user_id == commentData.user_id, comment_artikels.c.artikels_id == commentData.artikels_id))
+    return conn.execute(comment_artikels.select().where(comment_artikels.c.id == commentData.id, comment_artikels.c.user_id == commentData.user_id, comment_artikels.c.artikels_id == commentData.artikels_id)).first()
+
+@router.delete('/delet-comment-public/{id}')
+async def deletCommentPublic(id: int):
+    conn.execute(comment_artikels.delete().where(comment_artikels.c.id == id))
+    response = conn.execute(comment_artikels.select().where(comment_artikels.c.id == id)).first()
+    if not response :
+        return 'comment has been deleted'
+    else :
+        return 'failed to delete comment'

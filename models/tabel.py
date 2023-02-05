@@ -67,4 +67,22 @@ topup_user = Table(
     Column('correct_answer', String(500)),
 )
 
+like_artikels = Table(
+    'like_artikels',
+    metaData,
+    Column('id', Integer, primary_key=True),
+    Column('user_id', Integer, ForeignKey("users.id"), nullable=False),
+    Column('artikel_id', Integer, ForeignKey("artikels.id"), nullable=False),
+    Column('deskripsi', String(6)),
+)
+
+comment_artikels = Table(
+    'comment_artikels',
+    metaData,
+    Column('id', Integer, primary_key=True),
+    Column('user_id', Integer, ForeignKey("users.id"), nullable=False),
+    Column('artikels_id', Integer, ForeignKey("artikels.id"), nullable= False),
+    Column('content', String(10000))
+)
+
 metaData.create_all(engine)

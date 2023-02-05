@@ -56,3 +56,15 @@ class beliTiket(BaseModel):
 class answerChecker(BaseModel):
     soal: str
     correct_answer: str
+
+# !Comment Artikels
+class sendComment(BaseModel):
+    user_id: int
+    artikels_id: int
+    content: str
+
+class editComment(BaseModel):
+    id: int
+    user_id: int
+    artikels_id: int
+    content: str
